@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: log_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: log_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - log_pg_data:/var/lib/postgresql/data
+      - ./sql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d log_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pipeline:
+    build: .
+    container_name: log_pipeline
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_NAME: log_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_PORT: 5432
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    working_dir: /app/scripts
+    command: python run_pipeline.py /app/data/access.log
+
+volumes:
+  log_pg_data:
