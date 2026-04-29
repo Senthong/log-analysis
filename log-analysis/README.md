@@ -89,39 +89,6 @@ docker-compose up --build
 # Pipeline runs automatically, check reports/ when done
 ```
 
-### Option B — Local Python
-
-```bash
-pip install -r requirements.txt
-
-# Start Postgres separately (or use existing)
-export DB_HOST=localhost DB_NAME=log_db DB_USER=postgres DB_PASSWORD=postgres
-
-# Init schema
-psql -U postgres -d log_db -f sql/01_schema.sql
-
-# Run full pipeline
-cd scripts
-python run_pipeline.py ../data/access.log
-```
-
-### Explore SQL manually
-
-```bash
-psql -U postgres -d log_db
-
--- Top endpoints
-SELECT endpoint, total_hits, hit_rank FROM agg_endpoint_stats
-WHERE hit_rank <= 5 ORDER BY request_date DESC, hit_rank;
-
--- Suspicious IPs
-SELECT ip_address, total_requests, error_rate, anomaly_reason
-FROM agg_ip_anomalies WHERE is_suspicious = TRUE;
-
--- Data quality score
-SELECT report_date, total_raw, quality_score FROM data_quality_report;
-```
-
 ## Output Reports
 
 After running, `reports/` contains:
