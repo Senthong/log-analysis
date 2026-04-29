@@ -83,7 +83,7 @@ log-analysis/
 ### Option A — Docker (recommended)
 
 ```bash
-git clone https://github.com/yourusername/log-analysis.git
+git clone https://github.com/senthong/log-analysis.git
 cd log-analysis
 docker-compose up --build
 # Pipeline runs automatically, check reports/ when done
